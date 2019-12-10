@@ -1,39 +1,48 @@
 import { Component, OnInit } from '@angular/core';
+import { AlertController, NavController } from '@ionic/angular';
+import { NotesService } from '../services/notes.service';
 
 @Component({
-  selector: 'app-list',
+  selector: 'app-home',
   templateUrl: 'list.page.html',
-  styleUrls: ['list.page.scss']
+  styleUrls: ['list.page.scss'],
 })
 export class ListPage implements OnInit {
-  private selectedItem: any;
-  private icons = [
-    'flask',
-    'wifi',
-    'beer',
-    'football',
-    'basketball',
-    'paper-plane',
-    'american-football',
-    'boat',
-    'bluetooth',
-    'build'
-  ];
-  public items: Array<{ title: string; note: string; icon: string }> = [];
-  constructor() {
-    for (let i = 1; i < 11; i++) {
-      this.items.push({
-        title: 'Item ' + i,
-        note: 'This is item #' + i,
-        icon: this.icons[Math.floor(Math.random() * this.icons.length)]
-      });
-    }
+
+  constructor(public notesService: NotesService, private alertCtrl: AlertController, private navCtrl: NavController){
+
   }
 
-  ngOnInit() {
+  ngOnInit(){
+    this.notesService.load();
   }
-  // add back when alpha.4 is out
-  // navigate(item) {
-  //   this.router.navigate(['/list', JSON.stringify(item)]);
-  // }
+
+  addNote(){
+
+    this.alertCtrl.create({
+      header: 'New Note',
+      message: 'What should the title of this note be?',
+      inputs: [
+        {
+          type: 'text',
+          name: 'title'
+        }
+      ],
+      buttons: [
+        {
+          text: 'Cancel'
+        },
+        {
+          text: 'Save',
+          handler: (data) => {
+            this.notesService.createNote(data.title);
+          }
+        }
+      ]
+    }).then((alert) => {
+      alert.present();
+    });
+
+  }
+
 }
